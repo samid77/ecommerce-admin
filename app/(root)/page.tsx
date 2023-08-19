@@ -1,7 +1,6 @@
 'use client'
 
-import React, {useEffect, useState} from 'react';
-import Modal from "@/components/ui/modal"
+import React, {useEffect} from 'react';
 import { useModalHookStore } from '@/hooks/useModalHook';
 
 const SetupPage = () => {
