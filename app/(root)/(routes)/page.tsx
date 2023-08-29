@@ -11,13 +11,14 @@ const SetupPage = () => {
     if(!isOpen) onOpen()
   }, [isOpen, onOpen])
 
-  return (
-    <div className="flex flex-col gap-3 items-center justify-center p-10 text-lg font-semibold">
-      <div className="p-3 bg-gray-200 rounded-lg">
-        Root page, protected route
-      </div>
-    </div>
-  )
+  // return (
+  //   <div className="flex flex-col gap-3 items-center justify-center p-10 text-lg font-semibold">
+  //     <div className="p-3 bg-gray-200 rounded-lg">
+  //       Root page, protected route
+  //     </div>
+  //   </div>
+  // )
+  return null;
 }
 
 export default SetupPage
