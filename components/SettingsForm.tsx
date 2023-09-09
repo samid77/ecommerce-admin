@@ -5,12 +5,16 @@ import { Trash } from 'lucide-react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'react-hot-toast';
+import axios from 'axios';
+import { useParams, useRouter } from 'next/navigation';
 
 
 import Heading from '@/components/Heading'
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 
 
@@ -30,8 +34,29 @@ const SettingsForm: React.FC<SettingsFormProps> = ({initialData}) => {
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
   })
+  const params = useParams();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const onSubmit = async(data: SettingsFormValues) => {
+    try {
+        
+        setLoading(true);
+        await axios.patch(`/api/stores/${params.storeId}`, data)
+        router.refresh();
+        toast.success('Store updated.');
+
+    } catch (error) {
+        
+        console.error(error);
+        toast.error('Something went wrong.Store failed to change')
+
+    } finally {
+        
+        setLoading(false);
+
+    }
+  }
 
   return (
     <>
@@ -40,11 +65,31 @@ const SettingsForm: React.FC<SettingsFormProps> = ({initialData}) => {
                 title='Settings'
                 description='Manage store preferences'
             />
-            <Button size={'sm'} variant={'destructive'} onClick={() => {}}>
+            <Button disabled={loading} size={'sm'} variant={'destructive'} onClick={() => setOpen(true)}>
                 <Trash className='h-4 w-4'/>
             </Button>
         </div>
         <Separator />
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 w-full'>
+                <div className='grid grid-cols-3 gap-8'>
+                    <FormField 
+                     control={form.control}
+                     name='name'
+                     render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <Input disabled={loading} placeholder='Store name' {...field}/>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                     )}
+                    />
+                </div>
+                <Button disabled={loading} className='ml-auto' type='submit'>Save changes</Button>
+            </form>
+        </Form>
     </>
   )
 }

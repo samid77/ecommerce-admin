@@ -27,7 +27,7 @@ export default function StoreSwitcher({className, items = []}: StoreSwitcherProp
     value: item.id,
   }));
 
-  console.log(`items: ${JSON.stringify(items, undefined, 2)}`)
+  // console.log(`items: ${JSON.stringify(items, undefined, 2)}`)
 
   const currentStore = formattedItems.find((item) => item.value === params.storeId);
   const onStoreSelect = (store: {value: string, label: string}) => {
@@ -64,7 +64,8 @@ export default function StoreSwitcher({className, items = []}: StoreSwitcherProp
                             {store.label}
                             <Check 
                               className={
-                                cn('ml-auto h-4 w-4', currentStore?.value === store.value ? 'opacity-100' : 'opacity-0')
+                                cn('ml-auto h-4 w-4', 
+                                currentStore?.value === store.value ? 'opacity-100' : 'opacity-0')
                               }/>
                         </CommandItem>
                     ))}</CommandGroup>
