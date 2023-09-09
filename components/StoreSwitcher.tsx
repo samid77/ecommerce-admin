@@ -27,6 +27,8 @@ export default function StoreSwitcher({className, items = []}: StoreSwitcherProp
     value: item.id,
   }));
 
+  console.log(`items: ${JSON.stringify(items, undefined, 2)}`)
+
   const currentStore = formattedItems.find((item) => item.value === params.storeId);
   const onStoreSelect = (store: {value: string, label: string}) => {
     setOpen(false)
@@ -44,7 +46,7 @@ export default function StoreSwitcher({className, items = []}: StoreSwitcherProp
              aria-label='Select a store'
              className={cn('w-[200px] justify-between', className)}>
                 <StoreIcon className='mr-2 h-4 w-4' />
-                Current Store
+                {currentStore?.label}
                 <ChevronsUpDown className='ml-auto h-4 w-4 shrink-0 opacity-50'/>
             </Button>
         </PopoverTrigger>
@@ -57,10 +59,13 @@ export default function StoreSwitcher({className, items = []}: StoreSwitcherProp
                         <CommandItem 
                             key={store.value} 
                             onSelect={() => onStoreSelect(store)}
-                            className='text-sm'>
+                            className='text-sm cursor-pointer'>
                             <StoreIcon className='mr-2 h-4 w-4'/>
                             {store.label}
-                            <Check className={cn('ml-auto h-4 w-4', currentStore?.value === store.value ? 'opacity-100' : 'opacity-0')}/>
+                            <Check 
+                              className={
+                                cn('ml-auto h-4 w-4', currentStore?.value === store.value ? 'opacity-100' : 'opacity-0')
+                              }/>
                         </CommandItem>
                     ))}</CommandGroup>
                 </CommandList>

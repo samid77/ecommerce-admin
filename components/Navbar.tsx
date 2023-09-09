@@ -1,13 +1,27 @@
 import React from 'react'
-import { UserButton } from '@clerk/nextjs'
+import { UserButton, auth } from '@clerk/nextjs'
+import { redirect } from 'next/navigation';
+
 import { MainNav } from '@/components/MainNav'
 import StoreSwitcher from '@/components/StoreSwitcher'
+import prismadb from '@/lib/prismadb';
 
-const Navbar = () => {
+
+const Navbar = async() => {
+  const {userId} = auth()
+  if(!userId) redirect('/sign-in')
+
+  const stores = await prismadb.store.findMany({
+    where: {
+      userId: userId
+    }
+  })
+  if(!stores) redirect('/');
+
   return (
     <div className='border-b'>
         <div className='flex items-center h-16 px-4'>
-            <StoreSwitcher />
+            <StoreSwitcher items={stores}/>
             <MainNav className='mx-6'/>
             <div className='ml-auto flex items-center space-x-4'>
                 <UserButton afterSignOutUrl='/'/>
