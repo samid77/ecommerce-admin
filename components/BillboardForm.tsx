@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { Store } from '@prisma/client'
+import { Billboard } from '@prisma/client'
 import { Trash } from 'lucide-react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
@@ -18,31 +18,40 @@ import { Input } from '@/components/ui/input';
 import AlertModal from '@/components/modals/AlertModal';
 import ApiAlert from './ui/api-alert';
 import {useOriginHook} from '@/hooks/useOriginHook';
-
-
+import ImageUpload from '@/components/ui/image-upload';
 
 const formSchema = z.object({
-    name: z.string().min(1),
+    label: z.string().min(1),
+    imageUrl: z.string().min(1)
 })
 
-type SettingsFormValues = z.infer<typeof formSchema>;
+type BillboardFormValues = z.infer<typeof formSchema>;
 
-interface SettingsFormProps {
-    initialData: Store;
+interface BillboardFormProps {
+    initialData: Billboard | null;
 }
 
-const SettingsForm: React.FC<SettingsFormProps> = ({initialData}) => {
+const BillboardForm: React.FC<BillboardFormProps> = ({initialData}) => {
 
-  const form = useForm<SettingsFormValues>({
+  const form = useForm<BillboardFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: initialData || { 
+        label: '',
+        imageUrl: '',
+    },
   })
   const params = useParams();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const origin = useOriginHook();
-  const onSubmit = async(data: SettingsFormValues) => {
+  const title = initialData ? 'Edit Billboard' : 'Create Billboard';
+  const description = initialData ? 'Edit a Billboard' : 'Add a new billboard';
+  const toastMessage = initialData ? 'Billboard Updated' : 'Billboard Created';
+  const action = initialData ? 'Save Changes' : 'Create';
+
+
+  const onSubmit = async(data: BillboardFormValues) => {
     try {
         setLoading(true);
         await axios.patch(`/api/stores/${params.storeId}`, data)
@@ -82,41 +91,59 @@ const SettingsForm: React.FC<SettingsFormProps> = ({initialData}) => {
         />
         <div className='flex items-center justify-between'>
             <Heading 
-                title='Settings'
-                description='Manage store preferences'
+                title={title}
+                description={description}
             />
-            <Button disabled={loading} size={'sm'} variant={'destructive'} onClick={() => setOpen(true)}>
-                <Trash className='h-4 w-4'/>
-            </Button>
+            {
+                initialData && (
+                    <Button disabled={loading} size={'sm'} variant={'destructive'} onClick={() => setOpen(true)}>
+                        <Trash className='h-4 w-4'/>
+                    </Button>
+                )
+            }
         </div>
         <Separator />
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 w-full'>
+                <FormField 
+                    control={form.control}
+                    name='imageUrl'
+                    render={({field}) => (
+                    <FormItem>
+                        <FormLabel>Background Image</FormLabel>
+                        <FormControl>
+                            <ImageUpload 
+                                onRemove={() => field.onChange('')}
+                                onChange={(url) => field.onChange(url)}
+                                imageValue={field.value? [field.value] : []}
+                                disabled={loading}
+                            /> 
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
                 <div className='grid grid-cols-3 gap-8'>
                     <FormField 
                      control={form.control}
-                     name='name'
+                     name='label'
                      render={({field}) => (
                         <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel>Label</FormLabel>
                             <FormControl>
-                                <Input disabled={loading} placeholder='Store name' {...field}/>
+                                <Input disabled={loading} placeholder='Billboard Label' {...field}/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                      )}
                     />
                 </div>
-                <Button disabled={loading} className='ml-auto' type='submit'>Save changes</Button>
+                <Button disabled={loading} className='ml-auto' type='submit'>{action}</Button>
             </form>
         </Form>
         <Separator />
-        <ApiAlert 
-          title='NEXT_PUBLIC_API_URL' 
-          description={`${origin}/api/${params.storeId}`}
-          variant='public'/>
     </>
   )
 }
 
-export default SettingsForm
+export default BillboardForm
