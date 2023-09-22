@@ -19,8 +19,6 @@ export async function GET(_req: Request, {params}: {params: {billboardId: string
     }
 }
 
-
-
 export async function PATCH(req: Request, {params}: {params: {storeId: string, billboardId: string}}) {
  try {
     const {userId} = auth();
