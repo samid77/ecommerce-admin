@@ -16,7 +16,6 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import AlertModal from '@/components/modals/AlertModal';
-import ApiAlert from './ui/api-alert';
 import {useOriginHook} from '@/hooks/useOriginHook';
 import ImageUpload from '@/components/ui/image-upload';
 
@@ -54,12 +53,17 @@ const BillboardForm: React.FC<BillboardFormProps> = ({initialData}) => {
   const onSubmit = async(data: BillboardFormValues) => {
     try {
         setLoading(true);
-        await axios.patch(`/api/stores/${params.storeId}`, data)
+        if(initialData) {
+            await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`, data)
+        } else {
+            await axios.post(`/api/${params.storeId}/billboards`, data)
+        }
+        
         router.refresh();
-        toast.success('Store updated.');
+        toast.success(toastMessage);
     } catch (error) {
         console.error(error);
-        toast.error('Something went wrong.Store failed to change')
+        toast.error('Something went wrong. Billboard failed to change')
     } finally {
         setLoading(false);
     }
@@ -68,13 +72,13 @@ const BillboardForm: React.FC<BillboardFormProps> = ({initialData}) => {
   const onDelete = async() => {
     try {
         setLoading(true)
-        await axios.delete(`/api/stores/${params.storeId}`)
+        await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`)
         router.refresh();
         router.push('/');
-        toast.success('Store successfully delete')
+        toast.success('Billboard successfully delete')
     } catch (error) {
         console.error(error)
-        toast.error('Make sure you removed all products and categories first.')
+        toast.error('Make sure you removed all categories using this billboard.')
     } finally {
         setLoading(false);
         setOpen(false)
