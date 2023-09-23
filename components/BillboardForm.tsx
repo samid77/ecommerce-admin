@@ -9,7 +9,6 @@ import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 
-
 import Heading from '@/components/Heading'
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
